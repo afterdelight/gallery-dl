@@ -321,7 +321,7 @@ class DeviantartExtractor(Extractor):
         diff = time.time() - DeviantartExtractor._last_request
         if diff < 2.0:
             delay = 2.0 - diff
-            self.log.debug("Sleeping %.2f seconds", delay)
+            self.log.info("Sleeping %.2f seconds", delay)
             time.sleep(delay)
 
         while True:
@@ -1036,7 +1036,7 @@ class DeviantartOAuthAPI():
                 token = None
         self.refresh_token_key = token
 
-        self.log.debug(
+        self.log.info(
             "Using %s API credentials (client-id %s)",
             "default" if self.client_id == self.CLIENT_ID else "custom",
             self.client_id,
@@ -1235,7 +1235,7 @@ class DeviantartOAuthAPI():
         data = response.json()
 
         if response.status_code != 200:
-            self.log.debug("Server response: %s", data)
+            self.log.info("Server response: %s", data)
             raise exception.AuthenticationError('"{}" ({})'.format(
                 data.get("error_description"), data.get("error")))
         if refresh_token_key:
@@ -1267,7 +1267,7 @@ class DeviantartOAuthAPI():
             if data.get("error_description") == "User not found.":
                 raise exception.NotFoundError("user or group")
 
-            self.log.debug(response.text)
+            self.log.info(response.text)
             msg = "API responded with {} {}".format(
                 status, response.reason)
             if status == 429:
@@ -1304,7 +1304,7 @@ class DeviantartOAuthAPI():
             if extend:
                 if public and len(results) < params["limit"]:
                     if self.refresh_token_key:
-                        self.log.debug("Switching to private access token")
+                        self.log.info("Switching to private access token")
                         public = False
                         continue
                     elif data["has_more"] and warn:
