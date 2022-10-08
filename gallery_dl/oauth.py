@@ -123,12 +123,12 @@ class OAuth1API():
             token, token_secret = _token_cache(key)
 
         if api_key and api_secret and token and token_secret:
-            self.log.debug("Using %s OAuth1.0 authentication", key_type)
+            self.log.info("Using %s OAuth1.0 authentication", key_type)
             self.session = OAuth1Session(
                 api_key, api_secret, token, token_secret)
             self.api_key = None
         else:
-            self.log.debug("Using %s api_key authentication", key_type)
+            self.log.info("Using %s api_key authentication", key_type)
             self.session = extractor.session
             self.api_key = api_key
 
