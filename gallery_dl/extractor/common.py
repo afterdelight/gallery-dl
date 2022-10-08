@@ -203,7 +203,7 @@ class Extractor():
         time.sleep(seconds)
 
     def sleep(self, seconds, reason):
-        self.log.info("Sleeping for %.2f seconds (%s)",
+        self.log.info("Sleeping %.2f seconds (%s)",
                        seconds, reason)
         time.sleep(seconds)
 
