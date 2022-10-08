@@ -165,7 +165,7 @@ class Extractor():
             finally:
                 Extractor.request_timestamp = time.time()
 
-            self.log.debug("%s (%s/%s)", msg, tries, retries+1)
+            self.log.info("%s (%s/%s)", msg, tries, retries+1)
             if tries > retries:
                 break
             self.sleep(
@@ -203,7 +203,7 @@ class Extractor():
         time.sleep(seconds)
 
     def sleep(self, seconds, reason):
-        self.log.debug("Sleeping %.2f seconds (%s)",
+        self.log.info("Sleeping %.2f seconds (%s)",
                        seconds, reason)
         time.sleep(seconds)
 
@@ -340,7 +340,7 @@ class Extractor():
                     else:
                         _browser_cookies[key] = cookiejar
                 else:
-                    self.log.debug("Using cached cookies from %s", key)
+                    self.log.info("Using cached cookies from %s", key)
 
                 setcookie = self._cookiejar.set_cookie
                 for cookie in cookiejar:
