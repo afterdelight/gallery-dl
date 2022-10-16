@@ -224,7 +224,7 @@ def main():
             retval = 0
             for url in urls:
                 try:
-                    log.debug("Starting %s for '%s'", jobtype.__name__, url)
+                    log.info("Starting %s for '%s'", jobtype.__name__, url)
                     if isinstance(url, util.ExtendedUrl):
                         for opts in url.gconfig:
                             config.set(*opts)
