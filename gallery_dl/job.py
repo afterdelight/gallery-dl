@@ -44,7 +44,7 @@ class Job():
             "keywords" : output.KwdictProxy(self),
         }
         extr.log = self._wrap_logger(extr.log)
-        extr.log.debug("Using %s for '%s'", extr.__class__.__name__, extr.url)
+        extr.log.info("Using %s for '%s'", extr.__class__.__name__, extr.url)
 
         # data from parent job
         if parent:
@@ -422,7 +422,7 @@ class DownloadJob(Job):
                     "Failed to open download archive at '%s' ('%s: %s')",
                     archive, exc.__class__.__name__, exc)
             else:
-                extr.log.debug("Using download archive '%s'", archive)
+                extr.log.info("Using download archive '%s'", archive)
 
         skip = cfg("skip", True)
         if skip:
