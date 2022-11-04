@@ -394,7 +394,7 @@ Consider all sites to be NSFW unless otherwise known.
 <tr>
     <td>Instagram</td>
     <td>https://www.instagram.com/</td>
-    <td>Avatars, Collections, Highlights, Posts, Reels, Saved Posts, Stories, Tag Searches, Tagged Posts, User Profiles</td>
+    <td>Avatars, channels, Collections, Highlights, Posts, Reels, Saved Posts, Stories, Tag Searches, Tagged Posts, User Profiles</td>
     <td>Supported</td>
 </tr>
 <tr>
