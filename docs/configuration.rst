@@ -1519,6 +1519,7 @@ Description
     Possible values are
     ``"posts"``,
     ``"reels"``,
+    ``"channel"``,
     ``"tagged"``,
     ``"stories"``,
     ``"highlights"``,
