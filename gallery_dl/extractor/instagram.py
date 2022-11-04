@@ -385,6 +385,7 @@ class InstagramUserExtractor(InstagramExtractor):
             (InstagramPostsExtractor     , base + "posts/"),
             (InstagramReelsExtractor     , base + "reels/"),
             (InstagramTaggedExtractor    , base + "tagged/"),
+            (InstagramChannelExtractor   , base + "channel/"),
         ), ("posts",))
 
 
