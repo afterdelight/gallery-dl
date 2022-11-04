@@ -201,7 +201,8 @@ def main():
                             if sys.stdin:
                                 urls += util.parse_inputfile(sys.stdin, log)
                             else:
-                                log.warning("input file: stdin is not readable")
+                                log.warning(
+                                    "input file: stdin is not readable")
                         else:
                             with open(inputfile, encoding="utf-8") as file:
                                 urls += util.parse_inputfile(file, log)
@@ -235,7 +236,7 @@ def main():
                 except exception.TerminateExtraction:
                     pass
                 except exception.NoExtractorError:
-                    log.error("No suitable extractor found for '%s'", url)
+                    log.error("Unsupported URL '%s'", url)
                     retval |= 64
             return retval
 

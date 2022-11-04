@@ -68,6 +68,22 @@ class GelbooruBase():
         yield "https://img2.gelbooru.com" + path
         yield "https://img1.gelbooru.com" + path
 
+    def _notes(self, post, page):
+        notes_data = text.extract(page, '<section id="notes"', '</section>')[0]
+        if not notes_data:
+            return
+
+        post["notes"] = notes = []
+        extr = text.extract
+        for note in text.extract_iter(notes_data, '<article', '</article>'):
+            notes.append({
+                "width" : int(extr(note, 'data-width="', '"')[0]),
+                "height": int(extr(note, 'data-height="', '"')[0]),
+                "x"     : int(extr(note, 'data-x="', '"')[0]),
+                "y"     : int(extr(note, 'data-y="', '"')[0]),
+                "body"  : extr(note, 'data-body="', '"')[0],
+            })
+
 
 class GelbooruTagExtractor(GelbooruBase,
                            gelbooru_v02.GelbooruV02TagExtractor):
@@ -142,13 +158,23 @@ class GelbooruPoolExtractor(GelbooruBase,
 class GelbooruPostExtractor(GelbooruBase,
                             gelbooru_v02.GelbooruV02PostExtractor):
     """Extractor for single images from gelbooru.com"""
-    pattern = (r"(?:https?://)?(?:www\.)?gelbooru\.com/(?:index\.php)?"
-               r"\?page=post&s=view&id=(?P<post>\d+)")
+    pattern = (r"(?:https?://)?(?:www\.)?gelbooru\.com/(?:index\.php)?\?"
+               r"(?=(?:[^#]+&)?page=post(?:&|#|$))"
+               r"(?=(?:[^#]+&)?s=view(?:&|#|$))"
+               r"(?:[^#]+&)?id=(\d+)")
     test = (
         ("https://gelbooru.com/index.php?page=post&s=view&id=313638", {
             "content": "5e255713cbf0a8e0801dc423563c34d896bb9229",
             "count": 1,
         }),
+
+        ("https://gelbooru.com/index.php?page=post&s=view&id=313638"),
+        ("https://gelbooru.com/index.php?s=view&page=post&id=313638"),
+        ("https://gelbooru.com/index.php?page=post&id=313638&s=view"),
+        ("https://gelbooru.com/index.php?s=view&id=313638&page=post"),
+        ("https://gelbooru.com/index.php?id=313638&page=post&s=view"),
+        ("https://gelbooru.com/index.php?id=313638&s=view&page=post"),
+
         ("https://gelbooru.com/index.php?page=post&s=view&id=6018318", {
             "options": (("tags", True),),
             "content": "977caf22f27c72a5d07ea4d4d9719acdab810991",
@@ -172,21 +198,21 @@ class GelbooruPostExtractor(GelbooruBase,
             "keywords": {
                 "notes": [
                     {
-                        "height": 553,
                         "body": "Look over this way when you talk~",
+                        "height": 553,
                         "width": 246,
                         "x": 35,
-                        "y": 72
+                        "y": 72,
                     },
                     {
-                        "height": 557,
                         "body": "Hey~\nAre you listening~?",
+                        "height": 557,
                         "width": 246,
                         "x": 1233,
-                        "y": 109
-                    }
-                ]
-            }
+                        "y": 109,
+                    },
+                ],
+            },
         }),
     )
 

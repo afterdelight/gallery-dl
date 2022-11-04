@@ -1517,8 +1517,12 @@ Description
     when processing a user profile.
 
     Possible values are
-    ``"posts"``, ``"reels"``, ``"channel"``, ``"tagged"``,
-    ``"stories"``, ``"highlights"``.
+    ``"posts"``,
+    ``"reels"``,
+    ``"tagged"``,
+    ``"stories"``,
+    ``"highlights"``,
+    ``"avatar"``.
 
     You can use ``"all"`` instead of listing all values separately.
 
@@ -1972,8 +1976,8 @@ Description
     It is possible to use ``"all"`` instead of listing all values separately.
 
 
-extractor.pixiv.artworks.metadata
----------------------------------
+extractor.pixiv.metadata
+------------------------
 Type
     ``bool``
 Default
@@ -2396,6 +2400,27 @@ Description
     ``video``, ``audio``, ``photo``, ``chat``.
 
     You can use ``"all"`` instead of listing all types separately.
+
+
+extractor.tumblr.fallback-delay
+-------------------------------
+Type
+    ``float``
+Default
+    ``120.0``
+Description
+    Number of seconds to wait between retries
+    for fetching full-resolution images.
+
+
+extractor.tumblr.fallback-retries
+---------------------------------
+Type
+    ``integer``
+Default
+    ``2``
+Description
+    Number of retries for fetching full-resolution images.
 
 
 extractor.twibooru.api-key
@@ -2984,7 +3009,7 @@ Description
     Any file smaller/larger than this limit will not be downloaded.
 
     Possible values are valid integer or floating-point numbers
-    optionally followed by one of ``k``, ``m``. ``g``, ``t`` or ``p``.
+    optionally followed by one of ``k``, ``m``. ``g``, ``t``, or ``p``.
     These suffixes are case-insensitive.
 
 
@@ -3054,7 +3079,7 @@ Description
     Maximum download rate in bytes per second.
 
     Possible values are valid integer or floating-point numbers
-    optionally followed by one of ``k``, ``m``. ``g``, ``t`` or ``p``.
+    optionally followed by one of ``k``, ``m``. ``g``, ``t``, or ``p``.
     These suffixes are case-insensitive.
 
 
@@ -3113,6 +3138,22 @@ Description
     For example, this will change the filename extension (``{extension}``)
     of a file called ``example.png`` from ``png`` to ``jpg`` when said file
     contains JPEG/JFIF data.
+
+
+downloader.http.chunk-size
+--------------------------
+Type
+    ``integer`` or ``string``
+Default
+    ``32768``
+Example
+    ``"50k"``, ``"0.8M"``
+Description
+    Number of bytes per downloaded chunk.
+
+    Possible values are integer numbers
+    optionally followed by one of ``k``, ``m``. ``g``, ``t``, or ``p``.
+    These suffixes are case-insensitive.
 
 
 downloader.http.headers
@@ -3628,6 +3669,8 @@ Description
     ``post``
         When starting to download all files of a `post`,
         e.g. a Tweet on Twitter or a post on Patreon.
+    ``post-after``
+        After downloading all files of a `post`
 
 
 metadata.fields
