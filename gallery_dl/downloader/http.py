@@ -31,6 +31,7 @@ class HttpDownloader(DownloaderBase):
 
         self.adjust_extension = self.config("adjust-extensions", True)
         self.chunk_size = self.config("chunk-size", 32768)
+        self.metadata = extractor.config("http-metadata")
         self.progress = self.config("progress", 3.0)
         self.headers = self.config("headers")
         self.minsize = self.config("filesize-min")
@@ -90,11 +91,12 @@ class HttpDownloader(DownloaderBase):
         tries = 0
         msg = ""
 
+        metadata = self.metadata
         kwdict = pathfmt.kwdict
         adjust_extension = kwdict.get(
             "_http_adjust_extension", self.adjust_extension)
 
-        if self.part:
+        if self.part and not metadata:
             pathfmt.part_enable(self.partdir)
 
         while True:
@@ -171,13 +173,6 @@ class HttpDownloader(DownloaderBase):
                     self.log.warning("Invalid response")
                     return False
 
-            # set missing filename extension from MIME type
-            if not pathfmt.extension:
-                pathfmt.set_extension(self._find_extension(response))
-                if pathfmt.exists():
-                    pathfmt.temppath = ""
-                    return True
-
             # check file size
             size = text.parse_int(size, None)
             if size is not None:
@@ -191,6 +186,28 @@ class HttpDownloader(DownloaderBase):
                         "File size larger than allowed maximum (%s > %s)",
                         size, self.maxsize)
                     return False
+
+            build_path = False
+
+            # set missing filename extension from MIME type
+            if not pathfmt.extension:
+                pathfmt.set_extension(self._find_extension(response))
+                build_path = True
+
+            # set metadata from HTTP headers
+            if metadata:
+                kwdict[metadata] = util.extract_headers(response)
+                build_path = True
+
+            # build and check file path
+            if build_path:
+                pathfmt.build_path()
+                if pathfmt.exists():
+                    pathfmt.temppath = ""
+                    return True
+                if self.part and metadata:
+                    pathfmt.part_enable(self.partdir)
+                metadata = False
 
             content = response.iter_content(self.chunk_size)
 
@@ -257,42 +274,38 @@ class HttpDownloader(DownloaderBase):
         return True
 
     @staticmethod
-    def receive(fp, content, bytes_total, bytes_downloaded):
+    def receive(fp, content, bytes_total, bytes_start):
         write = fp.write
         for data in content:
             write(data)
 
-    def _receive_rate(self, fp, content, bytes_total, bytes_downloaded):
+    def _receive_rate(self, fp, content, bytes_total, bytes_start):
         rate = self.rate
-        progress = self.progress
-        bytes_start = bytes_downloaded
         write = fp.write
-        t1 = tstart = time.time()
+        progress = self.progress
+
+        bytes_downloaded = 0
+        time_start = time.time()
 
         for data in content:
-            write(data)
+            time_current = time.time()
+            time_elapsed = time_current - time_start
+            bytes_downloaded += len(data)
 
-            t2 = time.time()           # current time
-            elapsed = t2 - t1          # elapsed time
-            num_bytes = len(data)
+            write(data)
 
             if progress is not None:
-                bytes_downloaded += num_bytes
-                tdiff = t2 - tstart
-                if tdiff >= progress:
+                if time_elapsed >= progress:
                     self.out.progress(
-                        bytes_total, bytes_downloaded,
-                        int((bytes_downloaded - bytes_start) / tdiff),
+                        bytes_total,
+                        bytes_start + bytes_downloaded,
+                        int(bytes_downloaded / time_elapsed),
                     )
 
             if rate:
-                expected = num_bytes / rate  # expected elapsed time
-                if elapsed < expected:
-                    # sleep if less time elapsed than expected
-                    time.sleep(expected - elapsed)
-                    t2 = time.time()
-
-            t1 = t2
+                time_expected = bytes_downloaded / rate
+                if time_expected > time_elapsed:
+                    time.sleep(time_expected - time_elapsed)
 
     def _find_extension(self, response):
         """Get filename extension from MIME type"""
@@ -319,6 +332,7 @@ class HttpDownloader(DownloaderBase):
             for ext, check in SIGNATURE_CHECKS.items():
                 if check(file_header):
                     pathfmt.set_extension(ext)
+                    pathfmt.build_path()
                     return True
         return False
 
@@ -376,11 +390,13 @@ SIGNATURE_CHECKS = {
     "bmp" : lambda s: s[0:2] == b"BM",
     "webp": lambda s: (s[0:4] == b"RIFF" and
                        s[8:12] == b"WEBP"),
-    "avif": lambda s: s[4:12] == b"ftypavif",
+    "avif": lambda s: s[4:11] == b"ftypavi" and s[11] in b"fs",
     "svg" : lambda s: s[0:5] == b"<?xml",
     "ico" : lambda s: s[0:4] == b"\x00\x00\x01\x00",
     "cur" : lambda s: s[0:4] == b"\x00\x00\x02\x00",
     "psd" : lambda s: s[0:4] == b"8BPS",
+    "mp4" : lambda s: (s[4:8] == b"ftyp" and s[8:11] in (
+                       b"mp4", b"avc", b"iso", b"M4V")),
     "webm": lambda s: s[0:4] == b"\x1A\x45\xDF\xA3",
     "ogg" : lambda s: s[0:4] == b"OggS",
     "wav" : lambda s: (s[0:4] == b"RIFF" and
@@ -388,7 +404,7 @@ SIGNATURE_CHECKS = {
     "mp3" : lambda s: (s[0:3] == b"ID3" or
                        s[0:2] in (b"\xFF\xFB", b"\xFF\xF3", b"\xFF\xF2")),
     "zip" : lambda s: s[0:4] in (b"PK\x03\x04", b"PK\x05\x06", b"PK\x07\x08"),
-    "rar" : lambda s: s[0:6] == b"\x52\x61\x72\x21\x1A\x07",
+    "rar" : lambda s: s[0:6] == b"Rar!\x1A\x07",
     "7z"  : lambda s: s[0:6] == b"\x37\x7A\xBC\xAF\x27\x1C",
     "pdf" : lambda s: s[0:5] == b"%PDF-",
     "swf" : lambda s: s[0:3] in (b"CWS", b"FWS"),

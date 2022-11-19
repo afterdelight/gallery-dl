@@ -377,7 +377,6 @@ Description
     * ``idolcomplex``
     * ``imgbb``
     * ``inkbunny``
-    * ``instagram``
     * ``kemonoparty``
     * ``mangadex``
     * ``mangoxo``
@@ -512,6 +511,9 @@ Default
 Description
     User-Agent header value to be used for HTTP requests.
 
+    Setting this value to ``"browser"`` will try to automatically detect
+    and use the User-Agent used by the system's default browser.
+
     Note: This option has no effect on `pixiv` extractors,
     as these need specific values to function correctly.
 
@@ -521,7 +523,8 @@ extractor.*.browser
 Type
     ``string``
 Default
-    ``"firefox"`` for ``patreon``, ``null`` everywhere else
+    * ``"firefox"`` for ``patreon``, ``mangapark``, and ``mangasee``
+    * ``null`` everywhere else
 Example
     * ``"chrome:macos"``
 Description
@@ -584,6 +587,22 @@ Description
 
     For example, setting this option to ``"gdl_path"`` would make it possible
     to access the current file's filename as ``"[gdl_path.filename}"``.
+
+
+extractor.*.http-metadata
+-------------------------
+Type
+    ``string``
+Default
+    ``null``
+Description
+    Insert an ``object`` containing a file's HTTP headers and
+    ``filename``, ``extension``, and ``date`` parsed from them
+    into metadata dictionaries as the given name.
+
+    For example, setting this option to ``"gdl_http"`` would make it possible
+    to access the current file's ``Last-Modified`` header as ``"{gdl_http[Last-Modified]}"``
+    and its parsed form as ``"{gdl_http[date]}"``.
 
 
 extractor.*.category-transfer
@@ -1495,13 +1514,12 @@ extractor.instagram.api
 Type
     ``string``
 Default
-    ``"auto"``
+    ``"rest"``
 Description
     Selects which API endpoints to use.
 
-    * ``"rest"``: REST API - higher-resolution media, only usable when logged in
-    * ``"graphql"``: GraphQL API - lower-resolution media, partially accessible when not logged in
-    * ``"auto"``: Use REST API when logged in, GraphQL API otherwise
+    * ``"rest"``: REST API - higher-resolution media
+    * ``"graphql"``: GraphQL API - lower-resolution media
 
 
 extractor.instagram.include
@@ -2732,6 +2750,26 @@ Description
     See https://wallhaven.cc/help/api for more information.
 
 
+extractor.wallhaven.include
+---------------------------
+Type
+    * ``string``
+    * ``list`` of ``strings``
+Default
+    ``"uploads"``
+Example
+    * ``"uploads,collections"``
+    * ``["uploads", "collections"]``
+Description
+    A (comma-separated) list of subcategories to include
+    when processing a user profile.
+
+    Possible values are
+    ``"uploads"``, ``"collections"``.
+
+    It is possible to use ``"all"`` instead of listing all values separately.
+
+
 extractor.wallhaven.metadata
 ----------------------------
 Type
@@ -3578,7 +3616,9 @@ Description
     Selects how to process metadata.
 
     * ``"json"``: write metadata using `json.dump()
-      <https://docs.python.org/3/library/json.html#json.dump>`_
+      <https://docs.python.org/3/library/json.html#json.dump>`__
+    * ``"jsonl"``: write metadata in `JSON Lines
+      <https://jsonlines.org/>`__ format
     * ``"tags"``: write ``tags`` separated by newlines
     * ``"custom"``: write the result of applying `metadata.content-format`_
       to a file's metadata dictionary
@@ -3711,6 +3751,34 @@ Description
     Custom format string to build the content of metadata files with.
 
     Note: Only applies for ``"mode": "custom"``.
+
+
+metadata.open
+-------------
+Type
+    ``string``
+Defsult
+    ``"w"``
+Description
+    The ``mode`` in which metadata files get opened.
+
+    For example,
+    use ``"a"`` to append to a file's content
+    or ``"w"`` to truncate it.
+
+    See the ``mode`` parameter of |open()|_ for further details.
+
+
+metadata.encoding
+-----------------
+Type
+    ``string``
+Defsult
+    ``"utf-8"``
+Description
+    Name of the encoding used to encode a file's content.
+
+    See the ``encoding`` parameter of |open()|_ for further details.
 
 
 metadata.archive
@@ -4296,7 +4364,7 @@ Description
     * mode
         * Mode in which the file is opened;
           use ``"w"`` to truncate or ``"a"`` to append
-          (see `open() <https://docs.python.org/3/library/functions.html#open>`__)
+          (see |open()|_)
         * Default: ``"w"``
     * encoding
         * File encoding
@@ -4373,6 +4441,7 @@ Description
 .. |strptime| replace:: strftime() and strptime() Behavior
 .. |postprocessors| replace:: ``postprocessors``
 .. |mode: color| replace:: ``"mode": "color"``
+.. |open()| replace:: the built-in ``open()`` function
 
 .. _base-directory: `extractor.*.base-directory`_
 .. _date-format: `extractor.*.date-format`_
@@ -4386,6 +4455,7 @@ Description
 .. _datetime.max:       https://docs.python.org/3/library/datetime.html#datetime.datetime.max
 .. _strptime:           https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
 .. _webbrowser.open():  https://docs.python.org/3/library/webbrowser.html
+.. _open():             https://docs.python.org/3/library/functions.html#open
 .. _mature_content:     https://www.deviantart.com/developers/http/v1/20160316/object/deviation
 .. _Authentication:     https://github.com/mikf/gallery-dl#authentication
 .. _OAuth:              https://github.com/mikf/gallery-dl#oauth

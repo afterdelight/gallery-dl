@@ -37,6 +37,7 @@ class WeiboExtractor(Extractor):
         cookies = _cookie_cache()
         if cookies is not None:
             self.session.cookies.update(cookies)
+        self.session.headers["Referer"] = self.root + "/"
 
     def request(self, url, **kwargs):
         response = Extractor.request(self, url, **kwargs)
@@ -173,7 +174,7 @@ class WeiboExtractor(Extractor):
 
         page = Extractor.request(
             self, passport_url, method="POST", headers=headers, data=data).text
-        data = json.loads(text.extract(page, "(", ");")[0])["data"]
+        data = json.loads(text.extr(page, "(", ");"))["data"]
 
         passport_url = "https://passport.weibo.com/visitor/visitor"
         params = {

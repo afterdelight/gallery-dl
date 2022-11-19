@@ -143,6 +143,7 @@ SUBCATEGORY_MAP = {
     "search" : "Search Results",
     "status" : "Images from Statuses",
     "tag"    : "Tag Searches",
+    "tweets" : "",
     "user"   : "User Profiles",
     "watch"  : "Watches",
     "category"     : "Categories",
@@ -232,6 +233,7 @@ SUBCATEGORY_MAP = {
     },
     "wallhaven": {
         "collections": "",
+        "uploads"    : "",
     },
     "wallpapercave": {
         "image": "individual Images, Search Results",
@@ -287,7 +289,7 @@ AUTH_MAP = {
     "idolcomplex"    : "Supported",
     "imgbb"          : "Supported",
     "inkbunny"       : "Supported",
-    "instagram"      : "Supported",
+    "instagram"      : _COOKIES,
     "kemonoparty"    : "Supported",
     "mangadex"       : "Supported",
     "mangoxo"        : "Supported",

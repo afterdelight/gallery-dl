@@ -120,6 +120,15 @@ def extract(txt, begin, end, pos=0):
         return None, pos
 
 
+def extr(txt, begin, end, default=""):
+    """Stripped-down version of 'extract()'"""
+    try:
+        first = txt.index(begin) + len(begin)
+        return txt[first:txt.index(end, first)]
+    except (ValueError, TypeError, AttributeError):
+        return default
+
+
 def rextract(txt, begin, end, pos=-1):
     try:
         lbeg = len(begin)

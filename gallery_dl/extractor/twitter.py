@@ -14,10 +14,7 @@ from ..cache import cache
 import itertools
 import json
 
-BASE_PATTERN = (
-    r"(?:https?://)?(?:www\.|mobile\.)?"
-    r"(?:(?:[fv]x)?twitter\.com|nitter\.net)"
-)
+BASE_PATTERN = r"(?:https?://)?(?:www\.|mobile\.)?(?:[fv]x)?twitter\.com"
 
 
 class TwitterExtractor(Extractor):
@@ -227,8 +224,8 @@ class TwitterExtractor(Extractor):
                 response = self.request(url, fatal=False)
                 if response.status_code >= 400:
                     continue
-                url = text.extract(
-                    response.text, 'name="twitter:image" value="', '"')[0]
+                url = text.extr(
+                    response.text, 'name="twitter:image" value="', '"')
                 if url:
                     files.append({"url": url})
 
@@ -376,6 +373,24 @@ class TwitterExtractor(Extractor):
                     yield from self.api.tweet_detail(cid)
                 except Exception:
                     yield tweet
+
+    def _make_tweet(self, user, id_str, url, timestamp):
+        return {
+            "created_at": text.parse_timestamp(timestamp).strftime(
+                "%a %b %d %H:%M:%S +0000 %Y"),
+            "id_str": id_str,
+            "lang": None,
+            "user": user,
+            "entities": {},
+            "extended_entities": {
+                "media": [
+                    {
+                        "original_info": {},
+                        "media_url": url,
+                    },
+                ],
+            },
+        }
 
     def metadata(self):
         """Return general metadata"""
@@ -727,11 +742,6 @@ class TwitterTweetExtractor(TwitterExtractor):
             "pattern": r"https://\w+.cloudfront.net/photos/large/\d+.jpg",
             "count": 3,
         }),
-        # Nitter tweet (#890)
-        ("https://nitter.net/ed1conf/status/1163841619336007680", {
-            "url": "4a9ea898b14d3c112f98562d0df75c9785e239d9",
-            "content": "f29501e44d88437fe460f5c927b7543fda0f6e34",
-        }),
         # Twitter card (#1005)
         ("https://twitter.com/billboard/status/1306599586602135555", {
             "options": (("cards", True),),
@@ -848,6 +858,76 @@ class TwitterTweetExtractor(TwitterExtractor):
                 break
 
         return itertools.chain(buffer, tweets)
+
+
+class TwitterAvatarExtractor(TwitterExtractor):
+    subcategory = "avatar"
+    filename_fmt = "avatar {date}.{extension}"
+    archive_fmt = "AV_{user[id]}_{date}"
+    pattern = BASE_PATTERN + r"/(?!search)([^/?#]+)/photo"
+    test = (
+        ("https://twitter.com/supernaturepics/photo", {
+            "pattern": r"https://pbs\.twimg\.com/profile_images"
+                       r"/554585280938659841/FLVAlX18\.jpeg",
+            "keyword": {
+                "date": "dt:2015-01-12 10:26:49",
+                "extension": "jpeg",
+                "filename": "FLVAlX18",
+                "tweet_id": 554585280938659841,
+            },
+        }),
+        ("https://twitter.com/User16/photo", {
+            "count": 0,
+        }),
+    )
+
+    def tweets(self):
+        self.api._user_id_by_screen_name(self.user)
+        user = self._user_obj
+        url = user["legacy"]["profile_image_url_https"]
+
+        if url == ("https://abs.twimg.com/sticky"
+                   "/default_profile_images/default_profile_normal.png"):
+            return ()
+
+        url = url.replace("_normal.", ".")
+        id_str = url.rsplit("/", 2)[1]
+        timestamp = ((int(id_str) >> 22) + 1288834974657) // 1000
+
+        return (self._make_tweet(user, id_str, url, timestamp),)
+
+
+class TwitterBackgroundExtractor(TwitterExtractor):
+    subcategory = "background"
+    filename_fmt = "background {date}.{extension}"
+    archive_fmt = "BG_{user[id]}_{date}"
+    pattern = BASE_PATTERN + r"/(?!search)([^/?#]+)/header_photo"
+    test = (
+        ("https://twitter.com/supernaturepics/header_photo", {
+            "pattern": r"https://pbs\.twimg\.com/profile_banners"
+                       r"/2976459548/1421058583",
+            "keyword": {
+                "date": "dt:2015-01-12 10:29:43",
+                "filename": "1421058583",
+                "tweet_id": 0,
+            },
+        }),
+        ("https://twitter.com/User16/header_photo", {
+            "count": 0,
+        }),
+    )
+
+    def tweets(self):
+        self.api._user_id_by_screen_name(self.user)
+        user = user = self._user_obj
+
+        try:
+            url = user["legacy"]["profile_banner_url"]
+            _, timestamp = url.rsplit("/", 1)
+        except (KeyError, ValueError):
+            return ()
+
+        return (self._make_tweet(user, None, url, timestamp),)
 
 
 class TwitterImageExtractor(Extractor):
@@ -1021,7 +1101,7 @@ class TwitterAPI():
             "count": 100,
         }
         return self._pagination_tweets(
-            endpoint, variables, ("bookmark_timeline", "timeline"))
+            endpoint, variables, ("bookmark_timeline", "timeline"), False)
 
     def list_latest_tweets_timeline(self, list_id):
         endpoint = "/graphql/z3l-EHlx-fyg8OvGO4JN8A/ListLatestTweetsTimeline"
@@ -1253,7 +1333,8 @@ class TwitterAPI():
                 return
             params["cursor"] = cursor
 
-    def _pagination_tweets(self, endpoint, variables, path=None):
+    def _pagination_tweets(self, endpoint, variables,
+                           path=None, stop_tweets=True):
         extr = self.extractor
         variables.update(self.variables)
         original_retweets = (extr.retweets == "original")
@@ -1397,7 +1478,9 @@ class TwitterAPI():
                             tweet.get("rest_id"))
                         continue
 
-            if not tweet or not cursor:
+            if stop_tweets and not tweet:
+                return
+            if not cursor or cursor == variables.get("cursor"):
                 return
             variables["cursor"] = cursor
 
