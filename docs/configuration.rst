@@ -885,6 +885,27 @@ Description
     Try to follow external URLs of embedded players.
 
 
+extractor.artstation.max-posts
+------------------------------
+Type
+    ``integer``
+Default
+    ``null``
+Description
+    Limit the number of posts/projects to download.
+
+
+extractor.artstation.search.pro-first
+-------------------------------------
+Type
+    ``bool``
+Default
+    ``true``
+Description
+    Enable the "Show Studio and Pro member artwork first" checkbox
+    when retrieving search results.
+
+
 extractor.aryion.recursive
 --------------------------
 Type
@@ -3767,6 +3788,17 @@ Description
     or ``"w"`` to truncate it.
 
     See the ``mode`` parameter of |open()|_ for further details.
+
+
+metadata.private
+----------------
+Type
+    ``bool``
+Default
+    ``false``
+Description
+    Include private fields,
+    i.e. fields whose name starts with an underscore.
 
 
 metadata.encoding
