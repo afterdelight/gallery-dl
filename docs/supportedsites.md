@@ -111,7 +111,7 @@ Consider all sites to be NSFW unless otherwise known.
 </tr>
 <tr>
     <td>Bunkr</td>
-    <td>https://bunkr.is/</td>
+    <td>https://bunkr.ru/</td>
     <td>Albums</td>
     <td></td>
 </tr>
@@ -192,6 +192,12 @@ Consider all sites to be NSFW unless otherwise known.
     <td>https://fantia.jp/</td>
     <td>Creators, Posts</td>
     <td><a href="https://github.com/mikf/gallery-dl#cookies">Cookies</a></td>
+</tr>
+<tr>
+    <td>Fapachi</td>
+    <td>https://fapachi.com/</td>
+    <td>Posts, User Profiles</td>
+    <td></td>
 </tr>
 <tr>
     <td>Fappic</td>
@@ -428,20 +434,8 @@ Consider all sites to be NSFW unless otherwise known.
     <td></td>
 </tr>
 <tr>
-    <td>Kiss Goddess</td>
-    <td>https://kissgoddess.com/</td>
-    <td>Galleries, Models</td>
-    <td></td>
-</tr>
-<tr>
-    <td>Kohlchan</td>
-    <td>https://kohlchan.net/</td>
-    <td>Boards, Threads</td>
-    <td></td>
-</tr>
-<tr>
     <td>Komikcast</td>
-    <td>https://komikcast.me/</td>
+    <td>https://komikcast.site/</td>
     <td>Chapters, Manga</td>
     <td></td>
 </tr>
@@ -628,7 +622,7 @@ Consider all sites to be NSFW unless otherwise known.
 <tr>
     <td>Pixhost</td>
     <td>https://pixhost.to/</td>
-    <td>individual Images</td>
+    <td>Galleries, individual Images</td>
     <td></td>
 </tr>
 <tr>
@@ -768,6 +762,12 @@ Consider all sites to be NSFW unless otherwise known.
     <td>https://www.smugmug.com/</td>
     <td>Albums, individual Images, Images from Users and Folders</td>
     <td><a href="https://github.com/mikf/gallery-dl#oauth">OAuth</a></td>
+</tr>
+<tr>
+    <td>Soundgasm</td>
+    <td>https://soundgasm.net/</td>
+    <td>Audio, User Profiles</td>
+    <td></td>
 </tr>
 <tr>
     <td>Speaker Deck</td>
@@ -1041,6 +1041,22 @@ Consider all sites to be NSFW unless otherwise known.
 </tr>
 
 <tr>
+    <td colspan="4"><strong>LynxChan Imageboards</strong></td>
+</tr>
+<tr>
+    <td>Kohlchan</td>
+    <td>https://kohlchan.net/</td>
+    <td>Boards, Threads</td>
+    <td></td>
+</tr>
+<tr>
+    <td>Endchan</td>
+    <td>https://endchan.org/</td>
+    <td>Boards, Threads</td>
+    <td></td>
+</tr>
+
+<tr>
     <td colspan="4"><strong>Nijie Instances</strong></td>
 </tr>
 <tr>
@@ -1264,12 +1280,6 @@ Consider all sites to be NSFW unless otherwise known.
     <td colspan="4"><strong>FoOlSlide Instances</strong></td>
 </tr>
 <tr>
-    <td>Kirei Cake</td>
-    <td>https://reader.kireicake.com/</td>
-    <td>Chapters, Manga</td>
-    <td></td>
-</tr>
-<tr>
     <td>PowerManga</td>
     <td>https://read.powermanga.org/</td>
     <td>Chapters, Manga</td>
@@ -1370,12 +1380,6 @@ Consider all sites to be NSFW unless otherwise known.
 
 <tr>
     <td colspan="4"><strong>lolisafe and chibisafe</strong></td>
-</tr>
-<tr>
-    <td>ZzZz</td>
-    <td>https://zz.ht/</td>
-    <td>Albums</td>
-    <td></td>
 </tr>
 <tr>
     <td>xBunkr</td>
